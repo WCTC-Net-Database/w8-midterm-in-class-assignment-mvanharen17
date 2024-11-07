@@ -1,4 +1,6 @@
-﻿using W8_assignment_template.Data;
+﻿using System.Linq;
+using System.Transactions;
+using W8_assignment_template.Data;
 using W8_assignment_template.Helpers;
 using W8_assignment_template.Interfaces;
 using W8_assignment_template.Models.Characters;
@@ -15,6 +17,8 @@ public class GameEngine
     private readonly IRoomFactory _roomFactory;
     private ICharacter _player;
     private ICharacter _goblin;
+    private ICharacter _skeleton;
+    private ICharacter _zombie;
 
     private List<IRoom> _rooms;
 
@@ -37,14 +41,29 @@ public class GameEngine
 
     private void AttackCharacter()
     {
-        // TODO Update this method to allow for attacking a selected monster in the room.
-        // TODO e.g. "Which monster would you like to attack?"
-        // TODO Right now it just attacks the first monster in the room.
-        // TODO It is ok to leave this functionality if there is only one monster in the room.
-        var target = _player.CurrentRoom.Characters.FirstOrDefault(c => c != _player);
-        if (target != null)
+        _outputManager.WriteLine("Which monster would you like to attack?");
+        _outputManager.Display();
+        var target = _player.CurrentRoom.Characters;
+        int i = 1;
+        foreach (var c in _player.CurrentRoom.Characters)
         {
-            _player.Attack(target);
+            _outputManager.WriteLine($"{i}) {c.Name}");
+            _outputManager.Display();
+            i++;
+        }
+        var monsterInput = Console.ReadLine();
+
+        if (monsterInput == "1")
+        {
+            _player.Attack(target[0]);
+        }
+        else if (monsterInput == "2")
+        {
+            _player.Attack(target[1]);
+        }
+        else if (monsterInput == "3")
+        {
+            _player.Attack(target[2]);
         }
         else
         {
@@ -129,7 +148,13 @@ public class GameEngine
         var randomRoom = _rooms[random.Next(_rooms.Count)];
         randomRoom.AddCharacter(_goblin); // Use helper method
 
-        // TODO Load your two new monsters here into the same room
+        _skeleton = _context.Characters.OfType<Skeleton>().FirstOrDefault();
+        _zombie = _context.Characters.OfType<Zombie>().FirstOrDefault();
+
+        var newRandom = new Random();
+        var newRandomRoom = _rooms[newRandom.Next(_rooms.Count)];
+        newRandomRoom.AddCharacter(_skeleton);
+        newRandomRoom.AddCharacter(_zombie);
     }
 
     private void SetupGame()
@@ -151,7 +176,6 @@ public class GameEngine
 
     private IRoom SetupRooms()
     {
-        // TODO Update this method to create more rooms and connect them together
 
         var entrance = _roomFactory.CreateRoom("entrance", _outputManager);
         var treasureRoom = _roomFactory.CreateRoom("treasure", _outputManager);
@@ -159,6 +183,8 @@ public class GameEngine
         var library = _roomFactory.CreateRoom("library", _outputManager);
         var armory = _roomFactory.CreateRoom("armory", _outputManager);
         var garden = _roomFactory.CreateRoom("garden", _outputManager);
+        var crypt = _roomFactory.CreateRoom("crypt", _outputManager);
+        var kitchen = _roomFactory.CreateRoom("kitchen", _outputManager);
 
         entrance.North = treasureRoom;
         entrance.West = library;
@@ -167,6 +193,7 @@ public class GameEngine
         treasureRoom.South = entrance;
         treasureRoom.West = dungeonRoom;
 
+        dungeonRoom.North = crypt;
         dungeonRoom.East = treasureRoom;
 
         library.East = entrance;
@@ -175,9 +202,14 @@ public class GameEngine
         armory.North = library;
 
         garden.West = entrance;
+        garden.South = kitchen;
+
+        crypt.South = dungeonRoom;
+
+        kitchen.North = garden;
 
         // Store rooms in a list for later use
-        _rooms = new List<IRoom> { entrance, treasureRoom, dungeonRoom, library, armory, garden };
+        _rooms = new List<IRoom> { entrance, treasureRoom, dungeonRoom, library, armory, garden, crypt, kitchen };
 
         return entrance;
     }

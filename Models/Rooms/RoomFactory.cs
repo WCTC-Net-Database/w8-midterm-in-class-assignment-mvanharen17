@@ -5,7 +5,6 @@ namespace W8_assignment_template.Models.Rooms;
 
 public class RoomFactory : IRoomFactory
 {
-    // TODO You can add more rooms here
     public IRoom CreateRoom(string roomType, OutputManager outputManager)
     {
         switch (roomType.ToLower())
@@ -22,6 +21,10 @@ public class RoomFactory : IRoomFactory
                 return new Room("Armory", "Weapons and armor line the walls.", outputManager);
             case "garden":
                 return new Room("Garden", "A peaceful garden with blooming flowers.", outputManager);
+            case "crypt":
+                return new Room("Crypt", "Where the dead are put to rest.", outputManager);
+            case "kitchen":
+                return new Room("Kitchen", "The smell of fresh bread permeates the air.", outputManager);
             default:
                 return new Room("Generic Room", "A simple room.", outputManager);
         }

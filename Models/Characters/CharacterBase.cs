@@ -36,7 +36,6 @@ public abstract class CharacterBase : ICharacter
 
     public void Attack(ICharacter target)
     {
-        // TODO Update this method to ensure the character is removed after attacking them
 
         OutputManager.WriteLine($"{Name} attacks {target.Name} with a chilling touch.", ConsoleColor.Blue);
 
@@ -46,6 +45,8 @@ public abstract class CharacterBase : ICharacter
             player.Gold += 10; // Assuming each treasure is worth 10 gold
             targetWithTreasure.Treasure = null; // Treasure is taken
             OutputManager.WriteLine($"{Name} now has {player.Gold} gold", ConsoleColor.Blue);
+            var currentRoom = player.CurrentRoom;
+            currentRoom.RemoveCharacter(target);
         }
         else if (this is Player playerWithGold && target is Player targetWithGold && targetWithGold.Gold > 0)
         {
@@ -53,6 +54,8 @@ public abstract class CharacterBase : ICharacter
             OutputManager.WriteLine($"{Name} takes gold from {target.Name}", ConsoleColor.Blue);
             playerWithGold.Gold += targetWithGold.Gold;
             targetWithGold.Gold = 0; // Gold is taken
+            var currentRoom = playerWithGold.CurrentRoom;
+            currentRoom.RemoveCharacter(target);
         }
     }
 

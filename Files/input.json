@@ -47,5 +47,21 @@
     "Level": 2,
     "HP": 8,
     "Treasure": null
+  },
+  {
+    "$type": "Zombie",
+    "Name": "Moaning Zombie",
+    "Type": "Zombie",
+    "Level": 3,
+    "HP": 10,
+    "Treasure": "rotten flesh"
+  },
+  {
+    "$type": "Skeleton",
+    "Name": "Rattling Skeleton",
+    "Type": "Skeleton",
+    "Level": 2,
+    "HP": 10,
+    "Treasure": "skeleton key"
   }
 ]
